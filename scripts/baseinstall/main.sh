@@ -160,23 +160,8 @@ echo "[defaults]" >> /etc/ansible/ansible.cfg
 echo "inventory = inventory" >> /etc/ansible/ansible.cfg
   fi
 
-############################################################ Start of Role Execution
-#### DEPENDENCIES
-pg_dep=$( cat /var/plexguide/pg.dep )
-pg_dep_stored=$( cat /var/plexguide/pg.dep.stored )
-
-if [ "$pg_dep" == "$pg_dep_stored" ]
-    then
-      echo "25" | dialog --gauge "PG Dependencies Installed Already" 7 50 0
-      sleep 2
-    else 
-      echo "25" | dialog --gauge "Installing: PG Dependencies" 7 50 0
-      sleep 2
-      clear
-      ansible-playbook /opt/plexguide/ansible/critical.yml --tags preinstall
-      sleep 2
-      cat /var/plexguide/pg.dep > /var/plexguide/pg.dep.stored
-fi 
+#### Install Alias Command - 25 Percent
+bash /opt/plexguide/roles/baseline/scripts/preinstall.sh
 
 # START ########################### If doesn't exist, put /mnt into the file for the folders role
 file="/var/plexguide/server.hd.path"
@@ -190,7 +175,7 @@ fi
 
 
 #### Install Folders - 30 Percent
-bash /opt/plexguide/roles/folders/scripts/baseline.sh
+bash /opt/plexguide/roles/baseline/scripts/folders.sh
 
 ############################################################ Docker Install
 docker --version | awk '{print $3}' > /var/plexguide/docker.version
@@ -275,7 +260,7 @@ file="/usr/bin/docker" 1>/dev/null 2>&1
 fi
 
 #### Install Alias Command - 65 Percent
-bash /opt/plexguide/roles/alias/scripts/baseline.sh
+bash /opt/plexguide/roles/baseline/scripts/alias.sh
 
 
 echo "70" | dialog --gauge "Installing: PlexGuide Label" 7 50 0
@@ -310,7 +295,7 @@ ansible-playbook /opt/plexguide/ansible/critical.yml --tags clean &>/dev/null &
 sleep 2
 
 #### Install Alias Command - 85 Percent
-bash /opt/plexguide/roles/portainer/scripts/baseline.sh
+bash /opt/plexguide/roles/baseline/scripts/portainer.sh
 
 ############################################################ Reboot Startup Container Script
 pg_docstart=$( cat /var/plexguide/pg.docstart)
@@ -334,7 +319,7 @@ bash /opt/plexguide/scripts/containers/reboot.sh &>/dev/null &
 #sleep 2
 
 #### Install WatchTower Command - 95 Percent
-bash /opt/plexguide/roles/watchtower/scripts/baseline.sh
+bash /opt/plexguide/roles/baseline/scripts/watchtower.sh
 
 ############################# Python Support
 pg_python=$( cat /var/plexguide/pg.python )
