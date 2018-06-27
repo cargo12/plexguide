@@ -11,8 +11,12 @@ X 7. fix grep on filelock (needs exact match)
 X 8. refactor code to sort arrays & use tab delimiter
 X 9. fix race condition where filelock gets deleted before array is cleared,
      leading to the script attempting to upload a non-existent dir
+  10. Test out encryption
 
 CONFIG
 X 1. check to make sure previous transfer scripts are not running
   2. proper get opts
   3. help menu
+
+CHANGELOG
+  1. Added in encryption support

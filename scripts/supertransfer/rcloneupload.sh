@@ -12,7 +12,9 @@ rclone_upload() {
   # lock file so multiple uploads don't happen
   echo "${localFile}" >> $fileLock
   local fileSize="${1}"
-  local gdsa="${3}"
+  # encryption support, will use gdsa01c instead of gdsa01 for remote
+  # gdsa01c should be a crypt that points at gdsa01:/
+  [[ $encrypt == "yes" ]] && local gdsa="${3}c" || local gdsa="${3}"
   local remoteDir="${4}"
   local rclone_fin_flag=0
   local driveChunkSize
