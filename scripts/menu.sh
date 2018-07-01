@@ -1,223 +1,133 @@
 #!/bin/bash
+#
+# [PlexGuide Menu]
+#
+# GitHub:   https://github.com/Admin9705/PlexGuide.com-The-Awesome-Plex-Server
+# Author:   Admin9705 & Deiteq - Flicker-Rate
+# URL:      https://plexguide.com
+#
+# PlexGuide Copyright (C) 2018 PlexGuide.com
+# Licensed under GNU General Public License v3.0 GPL-3 (in short)
+#
+#   You may copy, distribute and modify the software as long as you track
+#   changes/dates in source files. Any modifications to our software
+#   including (via compiler) GPL-licensed code must also be made available
+#   under the GPL along with build & install instructions.
+#
+#################################################################################
+echo 'INFO - @PG Version Selection Menu' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
+
 export NCURSES_NO_UTF8_ACS=1
+clear
 
-###################### FOR VARIABLS ROLE SO DOESNT CREATE RED - START
-file="/var/plexguide"
-if [ -e "$file" ]
-then
-   clear 1>/dev/null 2>&1
-else
-   mkdir -p /var/plexguide 1>/dev/null 2>&1
-   chown 0755 /var/plexguide 1>/dev/null 2>&1
-   chmod 1000:1000 /var/plexguide 1>/dev/null 2>&1
-   echo 'INFO - PLexGuide Directory Was Created' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-fi
+HEIGHT=18
+WIDTH=33
+CHOICE_HEIGHT=11
+BACKTITLE="Visit https://PlexGuide.com - Automations Made Simple"
+TITLE="Select A PlexGuide Version"
+MENU="Make a Selection:"
 
-file="/opt/appdata/plexguide"
-if [ -e "$file" ]
-then
-   clear 1>/dev/null 2>&1
-else
-   echo 'INFO - PlexGuide Directory Was Created' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-   mkdir -p /opt/appdata/plexguide 1>/dev/null 2>&1
-   chown 0755 /opt/appdata/plexguide 1>/dev/null 2>&1
-   chmod 1000:1000 /opt/appdata/plexguide 1>/dev/null 2>&1
-fi
+OPTIONS=(00 "Developer     ~ 6.000"
+         Z "------ Exit Menu ------"
+         01 "LATEST BETA   ~ 6.000"
+         02 "Historical    ~ 5.1"
+         03 "Historical    ~ 5.013"
+         04 "Historical    ~ 4.1")
 
-## Create Dummy File on /mnt/gdrive/plexguide
-file="/mnt/unionfs/plexguide/pgchecker.bin"
-if [ -e "$file" ]
-then
-   echo 'PASSED - UnionFS is Properly Working - PGChecker.Bin' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-else
-   mkdir -p /mnt/tdrive/plexguide/ 1>/dev/null 2>&1
-   mkdir -p /mnt/gdrive/plexguide/ 1>/dev/null 2>&1
-   mkdir -p /tmp/pgchecker/ 1>/dev/null 2>&1
-   touch /tmp/pgchecker/pgchecker.bin 1>/dev/null 2>&1
-   rclone copy /tmp/pgchecker gdrive:/plexguide/ &>/dev/null &
-   rclone copy /tmp/pgchecker tdrive:/plexguide/ &>/dev/null &
-   rclone copy /tmp/pgchecker gcrypt:/plexguide/ &>/dev/null &
-   rclone copy /tmp/pgchecker tcrypt:/plexguide/ &>/dev/null &
-   echo 'INFO - Deployed PGChecker.bin to GDrive - PGChecker.Bin' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-fi
+CHOICE=$(dialog --clear \
+                --backtitle "$BACKTITLE" \
+                --title "$TITLE" \
+                --menu "$MENU" \
+                $HEIGHT $WIDTH $CHOICE_HEIGHT \
+                "${OPTIONS[@]}" \
+                2>&1 >/dev/tty)
 
-###################### FOR VARIABLS ROLE SO DOESNT CREATE RED - START
-file="/opt/appdata/plexguide/plextoken"
-if [ -e "$file" ]
-then
-   clear 1>/dev/null 2>&1
-else
-   echo 'INFO - Installed Dummy PlexToken' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-   touch /opt/appdata/plexguide/plextoken
-fi
+clear
+case $CHOICE in
+        00)
+echo 'INFO - Selected to Upgrade PG to DEV Edition' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
 
-file="touch /var/plexguide/server.ht"
-if [ -e "$file" ]
-then
-   clear 1>/dev/null 2>&1
-else
-   touch /var/plexguide/server.ht
-fi
-###################### FOR VARIABLS ROLE SO DOESNT CREATE RED - END
+            version="Developer"
 
-#### Set Fixed Information
-sudo bash /opt/plexguide/info.sh
+            file="/var/plexguide/ask.yes"
+            if [ -e "$file" ]
+            then
+            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
+            if ! dialog --stdout --title "Version User Confirmation" \
+               --backtitle "Visit https://PlexGuide.com - Automations Made Simple" \
+               --yesno "\nDo You Want Install Version - $version?" 7 50; then
+               dialog --title "PG Update Status" --msgbox "\nExiting! User selected to NOT Install!" 0 0
+            clear
+            sudo bash /opt/plexguide/scripts/message/ending.sh
+            exit 0
+                else
+            clear
+            fi
 
-#### Temp Variables Established To Prevent Crashing - START
-echo "plexguide" > /tmp/pushover
-#### Temp Variables Esablished  To Prevent Crashing - END
+            else
+                clear
+            fi
+            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
+            mv /opt/plexguide/scripts/docker-no/upgrade2.sh /tmp
+            cd /tmp
+            bash /tmp/upgrade2.sh
+            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
 
-echo "export NCURSES_NO_UTF8_ACS=1" >> /etc/bash.bashrc.local
-mkdir /var/plexguide/ 1>/dev/null 2>&1
-
-file="/usr/bin/dialog"
-if [ -e "$file" ]
-then
-   clear 1>/dev/null 2>&1
-else
-   clear
-   echo "Installing Dialog"
-   apt-get install dialog 1>/dev/null 2>&1
-   export NCURSES_NO_UTF8_ACS=1
-   echo "export NCURSES_NO_UTF8_ACS=1" >> /etc/bash.bashrc.local
-   echo 'INFO - Installed Dialog' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-fi
-# install pgstatus if needed
-[[ ! -e /bin/pgstatus ]] && \
- cp /opt/plexguide/scripts/docker-no/superstatus/pgstatus /bin/pgstatus
-
-#clear warning messages
-for txtfile in certchecker nopassword pingchecker; do
-  echo -n '' > /var/plexguide/$txtfile; done
-
-# security scan
-bash /opt/plexguide/scripts/startup/pg-auth-scan.sh &
-# traefik cert validation
-bash /opt/plexguide/scripts/startup/certchecker.sh &
-
-sudo rm -r /opt/plexguide/menus/version/main.sh && sudo mkdir -p /opt/plexguide/menus/version/ && sudo wget --force-directories -O /opt/plexguide/menus/version/main.sh https://raw.githubusercontent.com/Admin9705/PlexGuide.com-The-Awesome-Plex-Server/Version-6/menus/version/main.sh 1>/dev/null 2>&1
-
-# copying rclone config to user incase bonehead is not root
-cp /root/.config/rclone/rclone.conf ~/.config/rclone/rclone.conf 1>/dev/null 2>&1
-
-file="/var/plexguide/ubversion"
-if [ -e "$file" ]
-then
-   clear 1>/dev/null 2>&1
-else
-   echo 'INFO - Executing UB Version Check Script' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-   bash /opt/plexguide/scripts/ubcheck/main.sh
-fi
+            dialog --title "PG Application Status" --msgbox "\nUpgrade Complete - Version $version!" 0 0
+            clear
+            sudo bash /opt/plexguide/scripts/message/ending.sh
+            exit 0 ;;
+        Z)
+            bash /opt/plexguide/roles/main.sh
+echo 'INFO - Selected: Exit Upgrade Menu' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
+            exit 0
+            ;;
+        01)
+            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
+            version="6.000" ;;
+        02)
+            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
+            version="5.1" ;;
+        03)
+            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
+            version="5.013" ;;
+        04)
+            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
+            version="Legacy-v4" ;;
+esac
 
 file="/var/plexguide/ask.yes"
 if [ -e "$file" ]
 then
-   clear 1>/dev/null 2>&1
+
+touch /var/plexguide/ask.yes 1>/dev/null 2>&1
+if ! dialog --stdout --title "Version User Confirmation" \
+   --backtitle "Visit https://PlexGuide.com - Automations Made Simple" \
+   --yesno "\nDo Want to Install: Version - $version?" 7 50; then
+   dialog --title "PG Update Status" --msgbox "\nExiting! User selected to NOT Install!" 0 0
+clear
+echo 'INFO - Selected Not To Upgrade PG' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
+
+sudo bash /opt/plexguide/scripts/message/ending.sh
+exit 0
+    else
+  clear
+fi
+
 else
-   bash /opt/plexguide/menus/version/main.sh
-   echo "SUCCESS - First Time Execution" > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-   clear
-      echo "1. Please STAR PG via http://github.plexguide.com"
-      echo "2. Join the PG Discord via http://discord.plexguide.com"
-      echo "3. Donate to PG via http://donate.plexguide.com"
-      echo ""
-      echo "TIP : Press Z, then [ENTER] in the Menus to Exit"
-      echo "TIP : Menu Letters Displayed are HotKeys"
-      echo "TIP : Update Plexguide Anytime, type: sudo pgupdate"
-      echo "NOTE: Restart the Program Anytime, type: sudo plexguide"
-      echo ""
-   exit 0
+  clear
 fi
 
-edition=$( cat /var/plexguide/pg.edition )
-current=$( cat /var/plexguide/pg.preinstall )
-stored=$( cat /var/plexguide/pg.preinstall.stored )
-if [ "$current" == "$stored" ]
-then
-   echo 'INFO - PG BaseInstaller Not Required - Up To Date' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-   touch /var/plexguide/message.no
-else
-  ############## Executes PG Edition If User Never Selected One
-  file="/var/plexguide/pg.edition"
-  if [ -e "$file" ]
-  then
-     bash /opt/plexguide/menus/startup/message2.sh
-  else 
-  echo 'Asking User for PG Edition for the First Time' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-  bash /opt/plexguide/scripts/baseinstall/edition.sh
-  fi
+rm -rf /opt/plexguide 2>/dev/null
+wget https://github.com/Admin9705/PlexGuide.com-The-Awesome-Plex-Server/archive/$version.zip -P /tmp
+unzip /tmp/$version.zip -d /opt/
+mv /opt/PlexG* /opt/plexguide
+bash /opt/plexg*/sc*/ins*
+rm -r /tmp/$version.zip
+touch /var/plexguide/ask.yes 1>/dev/null 2>&1
 
-  echo 'INFO - PG BaseInstaller Executed' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-  bash /opt/plexguide/scripts/baseinstall/main.sh
-fi
+echo "INFO - Selected: Upgrade to PG $version" > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
 
-## docker / ansible failure
-file="/var/plexguide/startup.error" 1>/dev/null 2>&1
-  if [ -e "$file" ]
-    then
-    dialog --title "Docker Failure" --msgbox "\nYour Docker is not installed or has failed\n\n- Most problems are due to using a VPS\n- Using an OutDated Kernel\n- 99% is your VPS provider being SPECIAL\n- A modified version of Ubuntu\n\nTry a Reboot First and RERUN. If it fails, please check with site forums." 0 0
-    dialog --infobox "Exiting!" 0 0
-    sleep 5
-      echo 'FAILURE - Docker Failed To Install' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-      clear
-      echo "EXITED DUE TO DOCKER FAILURE!!!!!"
-      echo ""
-      echo "1. Please STAR PG via http://github.plexguide.com"
-      echo "2. Join the PG Discord via http://discord.plexguide.com"
-      echo "3. Donate to PG via http://donate.plexguide.com"
-      echo ""
-      echo "TIP : Press Z, then [ENTER] in the Menus to Exit"
-      echo "TIP : Menu Letters Displayed are HotKeys"
-      echo "TIP : Update Plexguide Anytime, type: sudo pgupdate"
-      echo "NOTE: Restart the Program Anytime, type: sudo plexguide"
-      echo ""
-    exit
-  fi
+bash /opt/plexguide/scripts/message/ending.sh
 
-# checking to see if PG Edition was set
-file="/var/plexguide/pg.edition"
-if [ -e "$file" ]
-then
-   bash /opt/plexguide/menus/startup/message2.sh
-else 
-echo 'WARNING - PG Edition Missing (Ask User - Executing Failsafe)' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-bash /opt/plexguide/scripts/baseinstall/edition.sh
-fi
-
-## Selects an edition
-edition=$( cat /var/plexguide/pg.edition )
-
-#### G-Drive Edition
-if [ "$edition" == "PG Edition: GDrive" ]
-  then
-    echo 'INFO - Deploying GDrive Interface Menu' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-    bash /opt/plexguide/menus/main.sh
-    exit
-fi
-
-#### Multiple Drive Edition
-if [ "$edition" == "PG Edition: HD Multi" ]
-  then
-    echo 'INFO - Deploying Multi HD Interface Menu' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-    bash /opt/plexguide/menus/localmain.sh
-    exit
-fi
-
-#### Solo Drive Edition
-if [ "$edition" == "PG Edition: HD Solo" ]
-  then
-   echo 'INFO - Deploying HD Solo Interface Menu' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-    bash /opt/plexguide/menus/localmain.sh
-    exit
-fi
-
-if [ "$edition" == "PG Edition: GCE Feed" ]
-  then
-   echo 'INFO - Deploying GCE Feeder Interface Menu' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-    bash /opt/plexguide/menus/gce.sh
-    exit
-fi
-
-#### falls to this menu incase none work above
-echo 'WARNING - PG Edition Missing (Ask User - Executing Failsafe)' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-bash /opt/plexguide/scripts/baseinstall/edition.sh
+## delete this later
