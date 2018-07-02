@@ -27,14 +27,13 @@ BACKTITLE="Visit https://PlexGuide.com - Automations Made Simple"
 TITLE="Select A PlexGuide Version"
 MENU="Make a Selection:"
 
-OPTIONS=(00 "Developer     ~ 6.000"
-         Z "------ Exit Menu ------"
-         01 "BETA 1        ~ 6.000"
-         02 "Historical    ~ 5.1"
-         03 "Historical    ~ 5.048"
-         04 "Historical    ~ 5.013"
-         05 "Historical    ~ 5.004"
-         06 "Historical    ~ 4.1")
+OPTIONS=(00 "Developer Edition     "
+         Z "----- Exit Menu -----"
+         01 "EDGE         ~ 6.001"
+         02 "STABLE       ~ 6.000"
+         03 "Historical   ~ 5.1"
+         04 "Historical   ~ 5.013"
+         05 "Historical   ~ 4.1")
 
 CHOICE=$(dialog --clear \
                 --backtitle "$BACKTITLE" \
@@ -80,26 +79,23 @@ echo 'INFO - Selected to Upgrade PG to DEV Edition' > /var/plexguide/pg.log && b
             sudo bash /opt/plexguide/scripts/message/ending.sh
             exit 0 ;;
         Z)
-            bash /opt/plexguide/menus/main.sh
+            bash /opt/plexguide/roles/main.sh
 echo 'INFO - Selected: Exit Upgrade Menu' > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
             exit 0
             ;;
         01)
             touch /var/plexguide/ask.yes 1>/dev/null 2>&1
-            version="6.000" ;;
+            version="6.001" ;;
         02)
             touch /var/plexguide/ask.yes 1>/dev/null 2>&1
-            version="5.1" ;;
+            version="6.000" ;;
         03)
             touch /var/plexguide/ask.yes 1>/dev/null 2>&1
-            version="5.048" ;;
+            version="5.1" ;;
         04)
             touch /var/plexguide/ask.yes 1>/dev/null 2>&1
             version="5.013" ;;
         05)
-            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
-            version="5.003" ;;
-        06)
             touch /var/plexguide/ask.yes 1>/dev/null 2>&1
             version="Legacy-v4" ;;
 esac
