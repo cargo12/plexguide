@@ -25,16 +25,11 @@ WIDTH=33
 CHOICE_HEIGHT=11
 BACKTITLE="Visit https://PlexGuide.com - Automations Made Simple"
 TITLE="Select A PlexGuide Version"
-MENU="Make a Selection:"
+MENU="Update to PG 6.007 to see FURTHER UPDATES"
 
 OPTIONS=(00 "Developer Edition     "
          Z "----- Exit Menu -----"
-         01 "EDGE         ~ 6.005"
-         02 "Release      ~ 6.004"
-         03 "Release      ~ 6.003"
-         04 "Historical   ~ 5.1"
-         05 "Historical   ~ 5.013"
-         06 "Historical   ~ 4.1")
+         01 "PG 5 to 6.007")
 
 CHOICE=$(dialog --clear \
                 --backtitle "$BACKTITLE" \
@@ -85,39 +80,8 @@ echo 'INFO - Selected: Exit Upgrade Menu' > /var/plexguide/pg.log && bash /opt/p
             exit 0
             ;;
         01)
-            file="/usr/bin/ansible"
-            if [ -e "$file" ]
-            then
-            echo "INFO - Selected: Installing Edge Edition - Ansible Detected" > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-            else
-            echo "INFO - Selected: Installing Edge Edition - Ansible Not Detected - Installing" > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-            dialog --title "NOTE" --msgbox "\nThis must be a new setup.  Anways, Ansible is needed for EDGE to Download!\n\nWe are going to install it early for you!" 0 0
-            bash /opt/plexguide/roles/baseline/scripts/ansible.sh
-            fi
-
-            ansible-playbook /opt/plexguide/pg.yml --tags pgedge
             touch /var/plexguide/ask.yes 1>/dev/null 2>&1
-            echo "INFO - Selected: Upgrade to PG EDGE" > /var/plexguide/pg.log && bash /opt/plexguide/scripts/log.sh
-            echo ""
-            read -n 1 -s -r -p "Press any key to continue"
-            bash /opt/plexguide/scripts/message/ending.sh
-            exit
-            ;;
-        02)
-            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
-            version="6.004" ;;
-        03)
-            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
-            version="6.003" ;;
-        04)
-            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
-            version="5.1" ;;
-        05)
-            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
-            version="5.013" ;;
-        06)
-            touch /var/plexguide/ask.yes 1>/dev/null 2>&1
-            version="Legacy-v4" ;;
+            version="6.007" ;;
 esac
 
 file="/var/plexguide/ask.yes"
